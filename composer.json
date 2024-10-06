@@ -21,6 +21,6 @@
         }
     },
     "bin": [
-        "bin/generate-hydrators"
+        "bin/generate-repositories"
     ]
 }

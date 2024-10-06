@@ -66,7 +66,7 @@ final class RepositoryClass
     {
         $instance = new self($repositoryClassName, $targetClassName, $idType, $hydratorName, $tableName);
 
-        $instance->constructorParams = ['private Connection $connection'];
+        $instance->constructorParams = ['protected Connection $connection'];
         $instance->imports = ['use Doctrine\DBAL\Connection;', 'use Doctrine\DBAL\ArrayParameterType;'];
 
         $instance->addMethod(new Sqlite\FetchByIdMethod($idField, $idType, $targetClassName));

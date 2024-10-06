@@ -54,4 +54,20 @@ final class ClassName
 
         return new self($newNamespace, $this->name);
     }
+
+    public function removeNamespacePostfix(string $namespacePostfix): self
+    {
+        $namespaceParts = explode('\\', $namespacePostfix);
+        $newNamespace = array_slice($this->namespaceParts, 0, - count($namespaceParts));
+
+        return new self($newNamespace, $this->name);
+    }
+
+    public function addNamespacePostfix(string $namespacePostfix): self
+    {
+        $namespaceParts = explode('\\', $namespacePostfix);
+        $newNamespace = [...$this->namespaceParts, ...$namespaceParts];
+
+        return new self($newNamespace, $this->name);
+    }
 }

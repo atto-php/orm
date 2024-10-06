@@ -33,12 +33,22 @@ final class Builder
             ->removeNamespacePrefix($commonNamespace)
             ->addNamespacePrefix($repositoryNamespace);
 
+        $hydratorName = str_replace('Repository', 'Hydrator', $repositoryClassName->asString());
+        $repositoryClassName = $repositoryClassName->addNamespacePostfix(
+            match ($repositoryType) {
+                'in-memory' => 'InMemory',
+                'sqlite' => 'SQLite',
+                default => 'Custom'
+            }
+        );
+
         return match($repositoryType) {
             'in-memory' => RepositoryClass::inMemory(
                 $repositoryClassName,
                 $class,
                 $idField,
                 $idType,
+                $hydratorName,
                 $tableName
             ),
             default => RepositoryClass::sqlite(
@@ -46,6 +56,7 @@ final class Builder
                 $class,
                 $idField,
                 $idType,
+                $hydratorName,
                 $tableName
             ),
         };

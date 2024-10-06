@@ -45,6 +45,7 @@ final class RepositoryClass
         private readonly ClassName $repositoryClassName,
         private readonly string $targetClassName,
         private readonly string $idType,
+        private readonly string $hydratorName,
         private readonly string $tableName,
     ){
     }
@@ -59,10 +60,11 @@ final class RepositoryClass
         string $targetClassName,
         string $idField,
         string $idType,
+        string $hydratorName,
         string $tableName,
     ): self
     {
-        $instance = new self($repositoryClassName, $targetClassName, $idType, $tableName);
+        $instance = new self($repositoryClassName, $targetClassName, $idType, $hydratorName, $tableName);
 
         $instance->constructorParams = ['private Connection $connection'];
         $instance->imports = ['use Doctrine\DBAL\Connection;', 'use Doctrine\DBAL\ArrayParameterType;'];
@@ -80,13 +82,14 @@ final class RepositoryClass
         string $targetClassName,
         string $idField,
         string $idType,
+        string $hydratorName,
         string $tableName,
     ): self
     {
-        $instance = new self($repositoryClassName, $targetClassName, $idType, $tableName);
+        $instance = new self($repositoryClassName, $targetClassName, $idType, $hydratorName, $tableName);
 
-        $instance->constructorParams = ['private Connection $connection'];
-        $instance->imports = ['use Doctrine\DBAL\Connection;', 'use Doctrine\DBAL\ArrayParameterType;'];
+        $instance->constructorParams = [];
+        $instance->imports = [];
 
         $instance->addMethod(new InMemory\FetchByIdMethod($idType, $targetClassName));
         $instance->addMethod(new InMemory\FetchByIdsMethod($idType, $targetClassName));
@@ -109,7 +112,7 @@ final class RepositoryClass
             $this->repositoryClassName->name,
             $this->idType, //id type
             $this->targetClassName, //entity name
-            'HydratorName', //hydrator name
+            $this->hydratorName, //hydrator name
             $this->tableName, //table name
             implode("\n", $this->imports),
             implode(",\n", $this->constructorParams), //constructor params

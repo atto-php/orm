@@ -16,7 +16,7 @@ final class RepositoryProvider
     public function __construct(
         private string $directory,
         private string $baseNamespace,
-        private string $hydratorNamespace
+        private string $repositoryNamespace
     ) {
         $this->builder = new Builder();
     }
@@ -26,7 +26,15 @@ final class RepositoryProvider
         $classList = $this->getEntityClasses();
 
         while ($class = array_pop($classList)) {
-            $repositoryCode = $this->builder->generateCodeFor($class, $this->hydratorNamespace, $this->baseNamespace);
+            $repositoryCode = $this->builder->generateCodeFor($class, 'in-memory', $this->repositoryNamespace, $this->baseNamespace);
+
+            yield new SimplePHPClassDefinition(
+                $repositoryCode->getRepositoryClassName()->namespace,
+                $repositoryCode->getRepositoryClassName()->name,
+                "<?php\n\n" . $repositoryCode
+            );
+
+            $repositoryCode = $this->builder->generateCodeFor($class, 'sqlite', $this->repositoryNamespace, $this->baseNamespace);
 
             yield new SimplePHPClassDefinition(
                 $repositoryCode->getRepositoryClassName()->namespace,

@@ -6,11 +6,8 @@ namespace Atto\Orm;
 
 use Atto\Orm\Attribute\Entity;
 use Atto\Orm\Attribute\Id;
-use Atto\Orm\Template\Sqlite\FetchByIdMethod;
 use Atto\Orm\Template\RepositoryClass;
-use Atto\Orm\Template\Sqlite\FetchByIdsMethod;
-use Atto\Orm\Template\Sqlite\RemoveMethod;
-use Atto\Orm\Template\Sqlite\SaveMethod;
+use Atto\Orm\ValueObjects\Field;
 
 final class Builder
 {
@@ -27,7 +24,21 @@ final class Builder
         $refl = new \ReflectionClass($class);
         $entityAttribute = current($refl->getAttributes(Entity::class)) ?: null;
         $tableName = $entityAttribute?->newInstance()->tableName ?? $refl->getShortName();
-        list($idType, $idField) = $this->findIdDetails($refl);
+        $idField = null;
+
+        foreach ($refl->getProperties() as $property) {
+            $idInfo = $this->checkForIdField($property);
+            if ($idInfo !== null) {
+                if ($idField !== null) {
+                    throw new \RuntimeException('Unable to support multiple id fields currently');
+                }
+                $idField = $idInfo;
+            }
+        }
+
+        if ($idField === null) {
+            throw new \RuntimeException('entity must have exactly one id field');
+        }
 
         $repositoryClassName = ClassName::fromFullyQualifiedName($class . 'Repository')
             ->removeNamespacePrefix($commonNamespace)
@@ -47,7 +58,6 @@ final class Builder
                 $repositoryClassName,
                 $class,
                 $idField,
-                $idType,
                 $hydratorName,
                 $tableName
             ),
@@ -55,47 +65,33 @@ final class Builder
                 $repositoryClassName,
                 $class,
                 $idField,
-                $idType,
                 $hydratorName,
                 $tableName
             ),
         };
     }
 
-    private function findIdDetails(\ReflectionClass $refl): array
+    private function checkForIdField(\ReflectionProperty $property): ?Field
     {
-        $idType = null;
-        $idField = null;
-
-        foreach ($refl->getProperties() as $property) {
-            $isId = current($property->getAttributes(Id::class)) !== false;
-            if ($isId && $idType !== null) {
-                throw new \RuntimeException('Unable to support multiple id fields currently');
-            }
-
-            if ($isId) {
-                $type = $property->getType();
-                if (!($type instanceof \ReflectionNamedType)) {
-                    throw new \RuntimeException('cannot handle multiple type hints');
-                }
-
-                if ($type === null) {
-                    throw new \RuntimeException('id field must have a type hint');
-                }
-
-                if ($type->getName() !== 'string' && $type->getName() !== 'int') {
-                    throw new \RuntimeException('Id field must be a string or an int');
-                }
-
-                $idType = $type->getName();
-                $idField = $property->getName();
-            }
+        $isId = current($property->getAttributes(Id::class)) !== false;
+        if (!$isId) {
+            return null;
         }
 
-        if ($idType === null) {
-            throw new \RuntimeException('entity must have exactly one id field');
+        $type = $property->getType();
+        if (!($type instanceof \ReflectionNamedType)) {
+            throw new \RuntimeException('cannot handle multiple type hints');
         }
 
-        return [$idType, $idField];
+        if ($type === null) {
+            throw new \RuntimeException('id field must have a type hint');
+        }
+
+        $typeName = $type->getName();
+        if ($typeName !== 'string' && $typeName !== 'int') {
+            throw new \RuntimeException('Id field must be a string or an int');
+        }
+
+        return new Field($property->getName(), $typeName);
     }
 }

@@ -9,6 +9,7 @@ use Atto\Orm\Template\Sqlite\FetchByIdMethod;
 use Atto\Orm\Template\Sqlite\FetchByIdsMethod;
 use Atto\Orm\Template\Sqlite\RemoveMethod;
 use Atto\Orm\Template\Sqlite\SaveMethod;
+use Atto\Orm\ValueObjects\Field;
 
 final class RepositoryClass
 {
@@ -58,21 +59,20 @@ final class RepositoryClass
     public static function sqlite(
         ClassName $repositoryClassName,
         string $targetClassName,
-        string $idField,
-        string $idType,
+        Field $field,
         string $hydratorName,
         string $tableName,
     ): self
     {
-        $instance = new self($repositoryClassName, $targetClassName, $idType, $hydratorName, $tableName);
+        $instance = new self($repositoryClassName, $targetClassName, $field->type, $hydratorName, $tableName);
 
         $instance->constructorParams = ['protected Connection $connection'];
         $instance->imports = ['use Doctrine\DBAL\Connection;', 'use Doctrine\DBAL\ArrayParameterType;'];
 
-        $instance->addMethod(new Sqlite\FetchByIdMethod($idField, $idType, $targetClassName));
-        $instance->addMethod(new Sqlite\FetchByIdsMethod($idField, $idType, $targetClassName));
-        $instance->addMethod(new Sqlite\SaveMethod($idField, $targetClassName));
-        $instance->addMethod(new Sqlite\RemoveMethod($idField, $targetClassName));
+        $instance->addMethod(new Sqlite\FetchByIdMethod($field->name, $field->type, $targetClassName));
+        $instance->addMethod(new Sqlite\FetchByIdsMethod($field->name, $field->type, $targetClassName));
+        $instance->addMethod(new Sqlite\SaveMethod($field->name, $targetClassName));
+        $instance->addMethod(new Sqlite\RemoveMethod($field->name, $targetClassName));
 
         return $instance;
     }
@@ -80,21 +80,20 @@ final class RepositoryClass
     public static function inMemory(
         ClassName $repositoryClassName,
         string $targetClassName,
-        string $idField,
-        string $idType,
+        Field $idField,
         string $hydratorName,
         string $tableName,
     ): self
     {
-        $instance = new self($repositoryClassName, $targetClassName, $idType, $hydratorName, $tableName);
+        $instance = new self($repositoryClassName, $targetClassName, $idField->type, $hydratorName, $tableName);
 
         $instance->constructorParams = [];
         $instance->imports = [];
 
-        $instance->addMethod(new InMemory\FetchByIdMethod($idType, $targetClassName));
-        $instance->addMethod(new InMemory\FetchByIdsMethod($idType, $targetClassName));
-        $instance->addMethod(new InMemory\SaveMethod($idField, $targetClassName));
-        $instance->addMethod(new InMemory\RemoveMethod($idField, $targetClassName));
+        $instance->addMethod(new InMemory\FetchByIdMethod($idField->type, $targetClassName));
+        $instance->addMethod(new InMemory\FetchByIdsMethod($idField->type, $targetClassName));
+        $instance->addMethod(new InMemory\SaveMethod($idField->name, $targetClassName));
+        $instance->addMethod(new InMemory\RemoveMethod($idField->name, $targetClassName));
 
         return $instance;
     }

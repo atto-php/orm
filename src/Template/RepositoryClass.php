@@ -67,12 +67,17 @@ final class RepositoryClass
         $instance = new self($repositoryClassName, $targetClassName, $field->type, $hydratorName, $tableName);
 
         $instance->constructorParams = ['protected Connection $connection'];
-        $instance->imports = ['use Doctrine\DBAL\Connection;', 'use Doctrine\DBAL\ArrayParameterType;'];
+        $instance->imports = [
+            'use Doctrine\DBAL\Connection;',
+            'use Doctrine\DBAL\ArrayParameterType;',
+            'use Doctrine\DBAL\Query\QueryBuilder;'
+        ];
 
         $instance->addMethod(new Sqlite\FetchByIdMethod($field->name, $field->type, $targetClassName));
         $instance->addMethod(new Sqlite\FetchByIdsMethod($field->name, $field->type, $targetClassName));
         $instance->addMethod(new Sqlite\SaveMethod($field->name, $targetClassName));
         $instance->addMethod(new Sqlite\RemoveMethod($field->name, $targetClassName));
+        $instance->addMethod(new Sqlite\HydrationHelpers($targetClassName, $field->name));
 
         return $instance;
     }

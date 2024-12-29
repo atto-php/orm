@@ -15,7 +15,7 @@ final class RemoveMethod
             
             $id = $this->idMap[spl_object_id($entity)];
             
-            $this->connection->delete(self::TABLE_NAME, ['%2$s' => $id]);
+            $this->connection->delete(static::TABLE_NAME, ['%2$s' => $id]);
             unset($this->entities[$id]);
             unset($this->idMap[spl_object_id($entity)]);
         }

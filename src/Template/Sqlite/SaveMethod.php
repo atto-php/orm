@@ -11,11 +11,11 @@ final class SaveMethod
         {
             $data = $this->hydrator->extract($entity);
             if (!isset($this->entities[$data['%2$s']])) {
-                $this->connection->insert(self::TABLE_NAME, $data);
+                $this->connection->insert(static::TABLE_NAME, $data);
                 $this->entities[$data['%2$s']] = $entity;
                 $this->idMap[spl_object_id($entity)] = $data['%2$s'];
             } else {
-                $this->connection->update(self::TABLE_NAME, $data, ['%2$s' => $data['%2$s']]);
+                $this->connection->update(static::TABLE_NAME, $data, ['%2$s' => $data['%2$s']]);
             }
         }
         EOF;

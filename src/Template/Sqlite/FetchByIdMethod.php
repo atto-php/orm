@@ -12,8 +12,8 @@ final class FetchByIdMethod
             if (!isset($this->entities[$id])) {
                 $qb = $this->connection->createQueryBuilder();
                 $data = $qb->select('*')
-                    ->from(static::TABLE_NAME)
-                    ->where($qb->expr()->eq('%3$s', ':id'))
+                    ->from('`' . static::TABLE_NAME . '`')
+                    ->where($qb->expr()->eq('`%3$s`', ':id'))
                     ->setParameter('id', $id)
                     ->executeQuery()
                     ->fetchAssociative()

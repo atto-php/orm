@@ -17,8 +17,8 @@ final class FetchByIdsMethod
             if (!empty($fetchRequired)) {
                 $qb = $this->connection->createQueryBuilder();
                 $data = $qb->select('*')
-                    ->from(static::TABLE_NAME)
-                    ->where($qb->expr()->in('%4$s', ':ids'))
+                    ->from('`' . static::TABLE_NAME . '`')
+                    ->where($qb->expr()->in('`%4$s`', ':ids'))
                     ->setParameter('ids', $ids, ArrayParameterType::%3$s)
                     ->executeQuery()
                 ;

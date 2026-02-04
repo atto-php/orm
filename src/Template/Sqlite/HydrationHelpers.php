@@ -15,10 +15,7 @@ final class HydrationHelpers
             $entities = [];
             
             while ($row = $data->fetchAssociative()) {
-                $entity = $this->hydrator->create($row);
-                $this->entities[$row['%2$s']] = $entity;
-                $this->idMap[spl_object_id($entity)] = $row['%2$s'];
-                $entities[] = $entity;
+                $entities[] = $this->hydrate($row);
             }
             
             return $entities;
@@ -27,6 +24,9 @@ final class HydrationHelpers
         /** @param array<string, mixed> $data */
         protected function hydrate(array $data): %1$s 
         {
+            if (isset($this->entities[$data['%2$s']])) {
+                return $this->entities[$data['%2$s']];
+            }
             $entity = $this->hydrator->create($data);
             $this->entities[$data['%2$s']] = $entity;
             $this->idMap[spl_object_id($entity)] = $data['%2$s'];

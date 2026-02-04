@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Atto\Orm\Template;
 
-use Atto\Orm\ClassName;
+use Atto\Orm\ValueObjects\ClassName;
 use Atto\Orm\Template\Sqlite\FetchByIdMethod;
 use Atto\Orm\Template\Sqlite\FetchByIdsMethod;
 use Atto\Orm\Template\Sqlite\RemoveMethod;
@@ -62,6 +62,7 @@ final class RepositoryClass
         Field $field,
         string $hydratorName,
         string $tableName,
+        Field ...$fields
     ): self
     {
         $instance = new self($repositoryClassName, $targetClassName, $field->type, $hydratorName, $tableName);
@@ -75,7 +76,7 @@ final class RepositoryClass
 
         $instance->addMethod(new Sqlite\FetchByIdMethod($field->name, $field->type, $targetClassName));
         $instance->addMethod(new Sqlite\FetchByIdsMethod($field->name, $field->type, $targetClassName));
-        $instance->addMethod(new Sqlite\SaveMethod($field->name, $targetClassName));
+        $instance->addMethod(new Sqlite\SaveMethod($field->name, $targetClassName, ...$fields));
         $instance->addMethod(new Sqlite\RemoveMethod($field->name, $targetClassName));
         $instance->addMethod(new Sqlite\HydrationHelpers($targetClassName, $field->name));
 

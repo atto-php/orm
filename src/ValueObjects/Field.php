@@ -11,4 +11,13 @@ final class Field
         public readonly string $type,
     ) {
     }
+
+    public function getParameterType(): string
+    {
+        return match ($this->type) {
+            'int' => '\Doctrine\DBAL\ParameterType::INTEGER',
+            'bool' => '\Doctrine\DBAL\ParameterType::BOOLEAN',
+            default => '\Doctrine\DBAL\ParameterType::STRING'
+        };
+    }
 }

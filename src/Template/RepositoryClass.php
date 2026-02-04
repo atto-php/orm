@@ -71,7 +71,8 @@ final class RepositoryClass
         $instance->imports = [
             'use Doctrine\DBAL\Connection;',
             'use Doctrine\DBAL\ArrayParameterType;',
-            'use Doctrine\DBAL\Query\QueryBuilder;'
+            'use Doctrine\DBAL\Query\QueryBuilder;',
+            'use Atto\Orm\Runtime\ValueObjects\Pagination;'
         ];
 
         $instance->addMethod(new Sqlite\FetchByIdMethod($field->name, $field->type, $targetClassName));
@@ -79,6 +80,7 @@ final class RepositoryClass
         $instance->addMethod(new Sqlite\SaveMethod($field->name, $targetClassName, ...$fields));
         $instance->addMethod(new Sqlite\RemoveMethod($field->name, $targetClassName));
         $instance->addMethod(new Sqlite\HydrationHelpers($targetClassName, $field->name));
+        $instance->addMethod(new Sqlite\PaginationHelpers());
 
         return $instance;
     }

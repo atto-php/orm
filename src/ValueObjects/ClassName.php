@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Atto\Orm;
+namespace Atto\Orm\ValueObjects;
 
 final class ClassName
 {

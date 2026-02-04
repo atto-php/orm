@@ -7,6 +7,7 @@ namespace Atto\Orm;
 use Atto\Orm\Attribute\Entity;
 use Atto\Orm\Attribute\Id;
 use Atto\Orm\Template\RepositoryClass;
+use Atto\Orm\ValueObjects\ClassName;
 use Atto\Orm\ValueObjects\Field;
 
 final class Builder
@@ -34,6 +35,7 @@ final class Builder
                 }
                 $idField = $idInfo;
             }
+            $fields[] = new Field($property->getName(), $property->getType()?->getName() ?? '');
         }
 
         if ($idField === null) {
@@ -66,7 +68,8 @@ final class Builder
                 $class,
                 $idField,
                 $hydratorName,
-                $tableName
+                $tableName,
+                ...$fields
             ),
         };
     }

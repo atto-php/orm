@@ -35,7 +35,7 @@ final class RepositoryClass
             
             public function __construct(%8$s)
             {
-                $this->hydrator = new %5$s();
+                $this->hydrator = %10$s;
             }
             
             %9$s
@@ -123,7 +123,8 @@ final class RepositoryClass
             $this->tableName, //table name
             implode("\n", $this->imports),
             implode(",\n", $this->constructorParams), //constructor params
-            implode("\n\n", $this->methods) //methods
+            implode("\n\n", $this->methods), //methods
+            new HydratorInstance($this->hydratorName),
         );
     }
 }

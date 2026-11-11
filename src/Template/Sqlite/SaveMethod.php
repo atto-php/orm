@@ -21,18 +21,18 @@ final class SaveMethod
             );
             if (!isset($this->entities[$data['`%2$s`']])) {
                 $this->connection->insert(
-                    '`' . static::TABLE_NAME . '`', 
-                    $data, 
-                    [%3$s]
+                    '`' . static::TABLE_NAME . '`',
+                    $data,
+                    array_merge([%3$s], static::$columnTypes ?? []),
                 );
                 $this->entities[$data['`%2$s`']] = $entity;
                 $this->idMap[spl_object_id($entity)] = $data['`%2$s`'];
             } else {
                 $this->connection->update(
-                    '`' . static::TABLE_NAME . '`', 
-                    $data, 
+                    '`' . static::TABLE_NAME . '`',
+                    $data,
                     ['`%2$s`' => $data['`%2$s`']],
-                    [%3$s]
+                    array_merge([%3$s], static::$columnTypes ?? []),
                 );
             }
         }
